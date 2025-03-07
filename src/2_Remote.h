@@ -2,9 +2,9 @@
 
 // Select (remove //) the remote configuration profile you have:
 // #define FLYSKY_FS_I6X            // <------- Flysky FS-i6x
-// #define FLYSKY_FS_I6S                // <------- Flysky FS-i6s
+ #define FLYSKY_FS_I6S                // <------- Flysky FS-i6s
 // #define FLYSKY_FS_I6S_LOADER     // <------- Flysky FS-i6s for BURNIE222 Volvo L120H loader (use IBUS communication setting)
-#define FLYSKY_FS_I6S_EXCAVATOR // <------- Flysky FS-i6s for KABOLITE K336 hydraulic excavator (use IBUS communication setting)
+// #define FLYSKY_FS_I6S_EXCAVATOR // <------- Flysky FS-i6s for KABOLITE K336 hydraulic excavator (use IBUS communication setting)
 // #define FLYSKY_GT5              // <------- Flysky GT5 / Reely GT6 EVO / Absima CR6P
 // #define RGT_EX86100             // <------- MT-305 remote delivered with RGT EX86100 crawler (use PWM communication setting)
 // #define GRAUPNER_MZ_12          // <------- Graupner MZ-12 PRO
@@ -41,8 +41,8 @@ uint16_t sbusFailsafeTimeout = 100; // Failsafe is triggered after this timeout 
 // #define PPM_COMMUNICATION // control signals are coming in via the PPM interface (comment it out for classic PWM RC signals)
 
 // CHANNEL LINEARITY SETTINGS  ****************************************************************************************************************
-
-#define EXPONENTIAL_THROTTLE // Exponential throttle curve. Ideal for enhanced slow speed control in crawlers
+// Note: avoid these options for excavators!
+// #define EXPONENTIAL_THROTTLE // Exponential throttle curve. Ideal for enhanced slow speed control in crawlers
 // #define EXPONENTIAL_STEERING // Exponential steering curve. More steering accuracy around center position
 
 // CHANNEL AVERAGING (EXPERIMENTAL!) **********************************************************************************************************

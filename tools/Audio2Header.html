@@ -47,6 +47,12 @@ function audioBufferToText(audioBuffer, normalize, resample, removeNoiseFloor, s
 		text += "const unsigned int sirenLoopBegin = 0; // Adjust start of loop manually\r\n";
 		text += "const unsigned int sirenLoopEnd = " + buffer.length + "; // Adjust end of loop manually\r\n";
 	}
+	if(snippet == "reversingS") // Optional variables for reversing beeper
+	{
+		text += "#define REVERSING_LOOP\r\n";
+		text += "const unsigned int reversingLoopBegin = 0; // Adjust start of loop manually\r\n";
+		text += "const unsigned int reversingLoopEnd = " + buffer.length + "; // Adjust end of loop manually\r\n";
+	}
 	text += "const signed char " + snippet + "amples[] = {"
 
 	var max = 0;
@@ -147,6 +153,7 @@ Modified by <a href="https://www.youtube.com/channel/UCqWO3PNCSjHmYiACDMLr23w">T
 		<option value="bucketRattleS">bucketRattle (Schaufelklappern)</option>
 		<option value="tireSquealS">tireSqueal (Reifenquietschen)</option>
         <option value="outOfFuelS">outOfFuel (kein Treibstoff)</option>
+		<option value="reversingS">reversingBeep (Rueckwaertswarner)</option>
 	</select>
 <br><br>
 

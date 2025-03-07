@@ -17,7 +17,7 @@
    Arduino IDE is supported as well, but I recommend to use VS Code, because libraries and boards are managed automatically.
 */
 
-char codeVersion[] = "9.14.0-b5"; // Software revision.
+char codeVersion[] = "9.14.0-b6"; // Software revision.
 
 //
 // =======================================================================================================
@@ -1067,6 +1067,10 @@ void IRAM_ATTR fixedPlaybackTimer()
     {
       b1 = (reversingSamples[curReversingSample] * reversingVolumePercentage / 100);
       curReversingSample++;
+#ifdef REVERSING_LOOP // Optional "endless loop" (points to be defined manually in reversing file)
+      if (curReversingSample >= reversingLoopEnd || curReversingSample >= reversingSampleCount - 2)
+        curReversingSample = reversingLoopBegin; // Loop, if trigger still present
+#endif
     }
     else
     {
@@ -1987,7 +1991,8 @@ void setup()
 #else
   // PWM ----
 #define PWM_COMMUNICATION
-#undef NEOPIXEL_ON_CH4 // not usable, pin is required as an input
+#undef NEOPIXEL_ENABLED // not usable
+#undef NEOPIXEL_ON_CH4  // not usable, pin is required as an input
   if (MAX_RPM_PERCENTAGE > maxPwmRpmPercentage)
     MAX_RPM_PERCENTAGE = maxPwmRpmPercentage; // Limit RPM range
   for (uint8_t i = 0; i < PWM_CHANNELS_NUM; i++)
@@ -2326,8 +2331,8 @@ void loopIbus()
   // Loop iBus (read signals)
   static unsigned long lastIbusRead;
   static uint16_t iBusReadCycles;
-  if (millis() - lastIbusRead > 10)
-  { // Every 10ms
+  if (millis() - lastIbusRead > 5) // was 10, Flysky Paladin not working??
+  {                                // Every 10ms
     lastIbusRead = millis();
     iBus.loop();
     if (iBusReadCycles < 100)
@@ -2700,7 +2705,7 @@ bool beaconControl(uint8_t pulses)
 
 void mcpwmOutput()
 {
-#if not defined SERVOS_EXCAVATOR && not defined SERVOS_HYDRAULIC_EXCAVATOR // Servo outputs, if not used in excavator servo mode
+#if not defined SERVOS_EXCAVATOR && not defined SERVOS_HYDRAULIC_EXCAVATOR // Servo outputs, if not used in excavator servo mode **************************
   if (autoZeroDone)                                                        // Only generate servo signals, if auto zero was successful!
   {
 
@@ -2887,151 +2892,164 @@ void mcpwmOutput()
   }
 #endif // SERVO_DEBUG
 
-#else // Servo outputs, if used in excavator servo mode. Including delay to simulate inertia
-
+#else // Servo outputs, if used in excavator servo mode. Including delay to simulate inertia **********************************************************
+  if (autoZeroDone) // Only generate servo signals, if auto zero was successful!
+  {
 #if defined PINGON_MODE
-  // detect Pingon mode (3 pos. switch remote CH10 in middle position) -------------
-  if (pulseWidth[4] > 1400 && pulseWidth[4] < 1600)
-  {
-    pingonLiftingMode = true;
-  }
-  else
-  {
-    pingonLiftingMode = false;
-  }
+    // detect Pingon mode (3 pos. switch remote CH10 in middle position) -------------
+    if (pulseWidth[4] > 1400 && pulseWidth[4] < 1600)
+    {
+      pingonLiftingMode = true;
+    }
+    else
+    {
+      pingonLiftingMode = false;
+    }
 
-  // Pingon wheel lift *********************
-  if (pingonLiftingMode)
-  {
-    mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_B, pulseWidth[5]); // operate pin 32 wheel lift
-    pulseWidth[1] = CH1C;                                                          // Lock all excavator functions
-    pulseWidth[2] = CH2C;
-    pulseWidth[5] = CH3C;
-  }
-  else
-  {
-    mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_B, CH3C); // lock pin 32 wheel lift
-  }
+    // Pingon wheel lift *********************
+    if (pingonLiftingMode)
+    {
+      mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_B, pulseWidth[5]); // operate pin 32 wheel lift
+      pulseWidth[1] = CH1C;                                                          // Lock all excavator functions
+      pulseWidth[2] = CH2C;
+      pulseWidth[5] = CH3C;
+    }
+    else
+    {
+      mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_B, CH3C); // lock pin 32 wheel lift
+    }
 #endif
 
 // Hydraulic pump on ESC output **********************
 #if defined SERVOS_HYDRAULIC_EXCAVATOR
-  static uint16_t pumpPulseWidth = ESC_C;
+    static uint16_t pumpPulseWidth = ESC_C;
 
-  // Mix cylinder pump rpm requests together
-  pumpPulseWidth = (reMap7(curveHydraulicPump, pulseWidth[1]) + reMap7(curveHydraulicPump, pulseWidth[2]) + reMap7(curveHydraulicPump, pulseWidth[5])) / 3;
-  pumpPulseWidth = constrain(pumpPulseWidth, ESC_MIN, ESC_MAX);
-  // Serial.printf(" Pump: %i µs\n", pumpPulseWidth);
-  mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, pumpPulseWidth);
+    // Mix cylinder pump rpm requests together
+    pumpPulseWidth = (reMap7(curveHydraulicPump, pulseWidth[1]) + reMap7(curveHydraulicPump, pulseWidth[2]) + reMap7(curveHydraulicPump, pulseWidth[5])) / 3;
+    pumpPulseWidth = constrain(pumpPulseWidth, ESC_MIN, ESC_MAX);
+    // Serial.printf(" Pump: %i µs\n", pumpPulseWidth);
+    mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, pumpPulseWidth);
 #endif
 
-  // Bucket CH1 **********************
-  static uint32_t CH1lastFrameTime = micros();
-  static uint16_t CH1servoMicros = CH1C;
+    // Bucket CH1 **********************
+    static uint32_t CH1lastFrameTime = micros();
+    static uint16_t CH1servoMicros = CH1C;
 
-  if (CH1_RAMP_TIME > 0)
-  {
-    if (micros() - CH1lastFrameTime > CH1_RAMP_TIME)
+    if (CH1_RAMP_TIME > 0)
     {
-      CH1lastFrameTime = micros();
-      if (pulseWidth[1] < CH1servoMicros)
-        CH1servoMicros--;
-      if (pulseWidth[1] > CH1servoMicros)
-        CH1servoMicros++;
-      CH1servoMicros = constrain(CH1servoMicros, CH1L, CH1R);
-      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, CH1servoMicros);
+      if (micros() - CH1lastFrameTime > CH1_RAMP_TIME)
+      {
+        CH1lastFrameTime = micros();
+        if (pulseWidth[1] < CH1servoMicros)
+          CH1servoMicros--;
+        if (pulseWidth[1] > CH1servoMicros)
+          CH1servoMicros++;
+        CH1servoMicros = constrain(CH1servoMicros, CH1L, CH1R);
+        mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, CH1servoMicros);
+      }
+    }
+    else // mode without delay
+    {
+#if defined SERVOS_HYDRAULIC_EXCAVATOR
+      pulseWidth[1] = reMap(curveHydraulicValve, pulseWidth[1]);
+      pulseWidth[1] = map(pulseWidth[1], pulseMin[1], pulseMax[1], CH1L, CH1R);
+      // Serial.printf(" Bucket: %i µs\n", pulseWidth[1]);
+      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, pulseWidth[1]);
+#else
+      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, pulseWidth[1]);
+#endif
+    }
+
+    // Dipper CH2 **********************
+    static uint32_t CH2lastFrameTime = micros();
+    static uint16_t CH2servoMicros = CH2C;
+
+    if (CH2_RAMP_TIME > 0)
+    {
+      if (micros() - CH2lastFrameTime > CH2_RAMP_TIME)
+      {
+        CH2lastFrameTime = micros();
+        if (pulseWidth[2] < CH2servoMicros)
+          CH2servoMicros--;
+        if (pulseWidth[2] > CH2servoMicros)
+          CH2servoMicros++;
+        CH2servoMicros = constrain(CH2servoMicros, CH2L, CH2R);
+        mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, CH2servoMicros);
+      }
+    }
+    else // mode without delay
+    {
+#if defined SERVOS_HYDRAULIC_EXCAVATOR
+      pulseWidth[2] = reMap(curveHydraulicValve, pulseWidth[2]);
+      pulseWidth[2] = map(pulseWidth[2], pulseMin[2], pulseMax[2], CH2L, CH2R);
+      // Serial.printf(" Dipper: %i µs\n", pulseWidth[2]);
+      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, pulseWidth[2]);
+#else
+      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, pulseWidth[2]);
+#endif
+    }
+
+    // Boom CH3 **********************
+    static uint32_t CH3lastFrameTime = micros();
+    static uint16_t CH3servoMicros = CH3C;
+
+    if (CH3_RAMP_TIME > 0)
+    {
+      if (micros() - CH3lastFrameTime > CH3_RAMP_TIME)
+      {
+        CH3lastFrameTime = micros();
+        if (pulseWidth[5] < CH3servoMicros)
+          CH3servoMicros--;
+        if (pulseWidth[5] > CH3servoMicros)
+          CH3servoMicros++;
+        CH3servoMicros = constrain(CH3servoMicros, CH3L, CH3R);
+        mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, CH3servoMicros);
+      }
+    }
+    else // mode without delay
+    {
+#if defined SERVOS_HYDRAULIC_EXCAVATOR
+      pulseWidth[5] = reMap(curveHydraulicValve, pulseWidth[5]);
+      pulseWidth[5] = map(pulseWidth[5], pulseMin[5], pulseMax[5], CH3L, CH3R);
+      // Serial.printf(" Boom: %i µs\n", pulseWidth[5]);
+      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, pulseWidth[5]);
+#else
+      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, pulseWidth[5]);
+#endif
+    }
+
+    // Swing CH4 **********************
+    static uint32_t CH4lastFrameTime = micros();
+    static uint16_t CH4servoMicros = CH4C;
+
+    if (pingonLiftingMode)
+    {
+      (pulseWidth[8] = CH4C); // Don't allow rotating the swing motor, but we still need the ramp below in case it is still moving!
+    }
+
+    if (micros() - CH4lastFrameTime > CH4_RAMP_TIME)
+    {
+      CH4lastFrameTime = micros();
+      if (pulseWidth[8] < CH4servoMicros)
+        CH4servoMicros--;
+      if (pulseWidth[8] > CH4servoMicros)
+        CH4servoMicros++;
+      CH4servoMicros = constrain(CH4servoMicros, CH4L, CH4R);
+      // Serial.println(CH4servoMicros);
+      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, CH4servoMicros);
     }
   }
-  else // mode without delay
+  else // autoZero not done = failsafe positions!
   {
 #if defined SERVOS_HYDRAULIC_EXCAVATOR
-    pulseWidth[1] = reMap(curveHydraulicValve, pulseWidth[1]);
-    pulseWidth[1] = map(pulseWidth[1], pulseMin[1], pulseMax[1], CH1L, CH1R);
-    // Serial.printf(" Bucket: %i µs\n", pulseWidth[1]);
-    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, pulseWidth[1]);
-#else
-    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, pulseWidth[1]);
+    mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, ESC_MIN); // Pump
 #endif
+    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, CH1C); // Bucket
+    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, CH2C); // Dipper
+    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, CH3C); // Boom
+    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, CH4C); // Swing
   }
 
-  // Dipper CH2 **********************
-  static uint32_t CH2lastFrameTime = micros();
-  static uint16_t CH2servoMicros = CH2C;
-
-  if (CH2_RAMP_TIME > 0)
-  {
-    if (micros() - CH2lastFrameTime > CH2_RAMP_TIME)
-    {
-      CH2lastFrameTime = micros();
-      if (pulseWidth[2] < CH2servoMicros)
-        CH2servoMicros--;
-      if (pulseWidth[2] > CH2servoMicros)
-        CH2servoMicros++;
-      CH2servoMicros = constrain(CH2servoMicros, CH2L, CH2R);
-      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, CH2servoMicros);
-    }
-  }
-  else // mode without delay
-  {
-#if defined SERVOS_HYDRAULIC_EXCAVATOR
-    pulseWidth[2] = reMap(curveHydraulicValve, pulseWidth[2]);
-    pulseWidth[2] = map(pulseWidth[2], pulseMin[2], pulseMax[2], CH2L, CH2R);
-    // Serial.printf(" Dipper: %i µs\n", pulseWidth[2]);
-    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, pulseWidth[2]);
-#else
-    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, pulseWidth[2]);
-#endif
-  }
-
-  // Boom CH3 **********************
-  static uint32_t CH3lastFrameTime = micros();
-  static uint16_t CH3servoMicros = CH3C;
-
-  if (CH3_RAMP_TIME > 0)
-  {
-    if (micros() - CH3lastFrameTime > CH3_RAMP_TIME)
-    {
-      CH3lastFrameTime = micros();
-      if (pulseWidth[5] < CH3servoMicros)
-        CH3servoMicros--;
-      if (pulseWidth[5] > CH3servoMicros)
-        CH3servoMicros++;
-      CH3servoMicros = constrain(CH3servoMicros, CH3L, CH3R);
-      mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, CH3servoMicros);
-    }
-  }
-  else // mode without delay
-  {
-#if defined SERVOS_HYDRAULIC_EXCAVATOR
-    pulseWidth[5] = reMap(curveHydraulicValve, pulseWidth[5]);
-    pulseWidth[5] = map(pulseWidth[5], pulseMin[5], pulseMax[5], CH3L, CH3R);
-    // Serial.printf(" Boom: %i µs\n", pulseWidth[5]);
-    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, pulseWidth[5]);
-#else
-    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, pulseWidth[5]);
-#endif
-  }
-
-  // Swing CH4 **********************
-  static uint32_t CH4lastFrameTime = micros();
-  static uint16_t CH4servoMicros = CH4C;
-
-  if (pingonLiftingMode)
-  {
-    (pulseWidth[8] = CH4C); // Don't allow rotating the swing motor, but we still need the ramp below in case it is still moving!
-  }
-
-  if (micros() - CH4lastFrameTime > CH4_RAMP_TIME)
-  {
-    CH4lastFrameTime = micros();
-    if (pulseWidth[8] < CH4servoMicros)
-      CH4servoMicros--;
-    if (pulseWidth[8] > CH4servoMicros)
-      CH4servoMicros++;
-    CH4servoMicros = constrain(CH4servoMicros, CH4L, CH4R);
-    // Serial.println(CH4servoMicros);
-    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, CH4servoMicros);
-  }
 #endif
 }
 
@@ -3991,7 +4009,7 @@ void led()
     { // Every 30ms
       flickerMillis = millis();
       if (engineStart)
-        crankingDim = random(25, 55);
+        crankingDim = random(35, 55); // was 25, 55, too intense
       else
         crankingDim = 0; // lights are dimmer and flickering while engine cranking
     }
@@ -5805,6 +5823,7 @@ void updateRGBLEDs()
 
 void excavatorControl()
 {
+#if defined EXCAVATOR_MODE
 
   static uint32_t lastFrameTime = millis();
   static uint16_t hydraulicPumpVolumeInternal[9];
@@ -5916,7 +5935,7 @@ void excavatorControl()
     // Calculate hydraulic load dependent Diesel knock volume
     hydraulicDependentKnockVolume = map(hydraulicPumpVolume, 0, 100, 50, 100);
 
-    // Calculate hydraulic load dependent engine RMP drop
+    // Calculate hydraulic load dependent engine RPM drop
     hydraulicLoad = map(hydraulicPumpVolume, 0, 100, 0, 40);
 
     // Bucket rattle sound triggering
@@ -5937,6 +5956,7 @@ void excavatorControl()
       lastDipperPulseWidth = pulseWidth[2];
     }
   }
+#endif
 }
 
 //

@@ -9,15 +9,15 @@ volatile int startVolumePercentage = 140; // Adjust the start volume (usually = 
 
 // Choose the motor idle sound (uncomment the one you want) --------
 volatile int idleVolumePercentage = 80; // Adjust the idle volume (usually = 100%, more also working, depending on sound, 50 - 60% if additional diesel knock sound is used)
-volatile int engineIdleVolumePercentage = 50; // the engine volume will be throttle dependent (usually = 40%, never more than 100%!)
+volatile int engineIdleVolumePercentage = 40; // the engine volume will be throttle dependent (usually = 40%, never more than 100%!)
 volatile int fullThrottleVolumePercentage = 150; // Volume Percentage while full throttle (for rev sound as well)
 #include "sounds/CAT730Idle.h" // CAT 730
 
 
 // Choose the motor revving sound (uncomment the one you want) --------
 #define REV_SOUND // uncomment this, if you want to use the separate, optional rev sound
-volatile int revVolumePercentage = 100; // Adjust the idle volume (usually = 100%, more also working, depending on sound)
-volatile int engineRevVolumePercentage = 50; // the engine volume will be throttle dependent (usually = 40%, never more than 100%!)
+volatile int revVolumePercentage = 90; // Adjust the idle volume (usually = 100%, more also working, depending on sound)
+volatile int engineRevVolumePercentage = 40; // the engine volume will be throttle dependent (usually = 40%, never more than 100%!)
 volatile const uint16_t revSwitchPoint = 50; // The rev sound is played instead of the idle sound above this point
 volatile const uint16_t idleEndPoint = 300; // above this point, we have 100% rev and 0% idle sound volume (usually 500, min. 50 more than revSwitchPoint)
 volatile const uint16_t idleVolumeProportionPercentage = 100; // The idle sound volume proportion (rest is rev proportion) below "revSwitchPoint" (about 90 - 100%, never more than 100)
@@ -140,8 +140,9 @@ volatile int sound1VolumePercentage = 100; // Adjust the sound1 volume (usually 
 #include "sounds/door.h" // opening and closing the door
 
 // Choose the reversing beep sound --------
-volatile int reversingVolumePercentage = 70; // Adjust the reversing sound volume (usually = 70%)
-#include "sounds/TruckReversingBeep.h" // 1000Hz peep sound
+volatile int reversingVolumePercentage = 200; // Adjust the reversing sound volume (usually = 70%)
+//#include "sounds/TruckReversingBeep.h" // 1000Hz beep sound
+#include "sounds/CATreversingBeep.h" // CAT beep sound
 
 // Choose the indicator / turn signal options --------
 volatile int indicatorVolumePercentage = 100; // Adjust the indicator sound volume (usually = 100%)
@@ -167,7 +168,7 @@ volatile int hydraulicPumpVolumePercentage = 120; // Adjust the volume (usually 
 #include "sounds/Caterpillar323Hydraulic2.h" // Caterpillar 323 excavator (slowed down by factor 2)
 
 // Choose the hydraulic fluid flow sound (uncomment the one you want) --------
-volatile int hydraulicFlowVolumePercentage = 20; // Adjust the volume (usually = 20%)
+volatile int hydraulicFlowVolumePercentage = 15; // Adjust the volume (usually = 20%)
 //#include "sounds/Caterpillar323HydraulicFlow.h" // Caterpillar 323 excavator
 #include "sounds/hydraulicHiss.h" // Caterpillar 323 excavator
 

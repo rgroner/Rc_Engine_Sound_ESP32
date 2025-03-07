@@ -4,14 +4,15 @@
  *
  * All light settings are now done here and are not part of the vehicle file anymore
  * All #define settings are only adjustable during compile time and are not changeable afterwards!
- * 
+ *
  * The other ones can be changed here or on 192.168.4.1, if connected to your vehicles WiFi access point
  * Note, that the settings are only applied on a new or comletely erased ESP32. Afterwards they are stored in the EEPROM
  * They can also be applied by changing the "eeprom_id" in "0_GeneralSettings"
  */
 
 // Neopixel settings ----------------------------------------------------------------------------------------------------------------------------------------
-#define NEOPIXEL_ENABLED     // GPIO0 used for WS2812 Neopixel control, if defined! Always enabled, unless you have issues with the library!
+// Note: Neopixels only usable, if not in PWM mode, otherwise disable it!
+// #define NEOPIXEL_ENABLED  // GPIO0 used for WS2812 Neopixel control, if defined! you can disable it, if not requierd
 #if defined NEOPIXEL_ENABLED // only selectable, if NEOPIXELS are in use ---
 // #define NEOPIXEL_ON_CH4 // The CH 4 servo header is used as Neopixel output, if defined (BUS communication mode only, intended for RC trailer controller, no coupler servo)
 #endif                          // ---
@@ -37,10 +38,10 @@ uint8_t neopixelMode = 2; // See above
 bool noCabLights = false;                 // The cablights step in the lights sequence is skipped, if true
 bool noFogLights = false;                 // The foglights step in the lights sequence is skipped, if true
 bool xenonLights = false;                 // Headlights will show a xenon bulb ignition flash, if true
-bool flickeringWileCranking = false;      // if true: The lights will flicker a bit during engine cranking, otherwise they are just a bit dimmed
+bool flickeringWileCranking = false;       // if true: The lights will flicker a bit during engine cranking, otherwise they are just a bit dimmed
 bool ledIndicators = false;               // indicators are switching "hard" (without fading like an incandescent bulb), if true (was LED_INDICATORS)
 bool swap_L_R_indicators = false;         // If you want to swap L & R indicators
-bool indicatorsAsSidemarkers = true;     // "US Mode" The indicators are used as side markers as well. This is commonly used in US trucks.
+bool indicatorsAsSidemarkers = true;      // "US Mode" The indicators are used as side markers as well. This is commonly used in US trucks.
 bool separateFullBeam = false;            // The full beam is a separate bulb, connected to roof lights pin. Connect roof lights to side lights in this case
 bool flashingBlueLight = true;            // double flash blue lights if "true", "rotating" beacons if "false"
 bool hazardsWhile5thWheelUnlocked = true; // Hazards on, if 5th wheel is unlocked

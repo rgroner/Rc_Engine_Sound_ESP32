@@ -20,7 +20,7 @@
  */
 
 // Select the vehicle configuration you have:
-// #define SERVOS_DEFAULT // <------- Select (remove //) one of the remote configurations below
+ #define SERVOS_DEFAULT // <------- Select (remove //) one of the remote configurations below
 // #define SERVOS_LANDY_MN_MODEL
 // #define SERVOS_LANDY_DOUBLE_EAGLE
 // #define SERVOS_C34
@@ -31,8 +31,9 @@
 // #define SERVOS_RACING_TRUCK
 // #define SERVOS_MECCANO_DUMPER
 // #define SERVOS_OPEN_RC_TRACTOR
+// NOTICE: The following profiles are for EXCAVATOR_MODE only! ---------------------
 // #define SERVOS_EXCAVATOR // For excavators with electric actuators
-#define SERVOS_HYDRAULIC_EXCAVATOR // For hydraulic excavators
+// #define SERVOS_HYDRAULIC_EXCAVATOR // For hydraulic excavators
 
 // Default servo configuration profile -------------------------------------------------------------------------------------------
 #ifdef SERVOS_DEFAULT
@@ -262,8 +263,12 @@ uint16_t STEERING_RAMP_TIME = 0; // 0 = fastest speed, enlarge it to around 3000
 
 #endif
 
+// NOTICE: The following profiles are for EXCAVATOR_MODE only! **********************************************************************************************
 // Electric excavator servo configuration profile -------------------------------------------------------------------------------------------
 #ifdef SERVOS_EXCAVATOR
+
+boolean boomDownwardsHydraulic = false; // hydraulic load sound as well for boom downwards
+boolean reverseBoomSoundDirection = false; // reverse sound direction, if needed (for example if hoses can't be swapped)
 
 // Servo frequency
 const uint8_t SERVO_FREQUENCY = 50; // usually 50Hz, some servos may run smoother @ 100Hz
@@ -303,17 +308,17 @@ uint16_t CH2L = 1040, CH2C = 1500, CH2R = 2040; // CH2 dipper valve
 uint16_t CH3L = 960, CH3C = 1500, CH3R = 2060; // CH3 boom valve
 
 // Swing ESC limits
-uint16_t CH4L = 1375, CH4C = 1500, CH4R = 1625; // CH4 swing ESC
+uint16_t CH4L = 1350, CH4C = 1500, CH4R = 1650; // CH4 swing ESC 1375, 1625
 
 // Hydraulic pump limits
-uint16_t ESC_L = 1000, ESC_C = 1500, ESC_R = 2000; // ESC output for oil pump
-uint16_t ESC_MIN = 1500;
-uint16_t ESC_MAX = 1800;
+uint16_t ESC_L = 1000, ESC_C = 1500, ESC_R = 2000; // ESC output for oil pump (always 1000, 1500, 2000)
+uint16_t ESC_MIN = 1500; // Pump off
+uint16_t ESC_MAX = 1800; // Pump max. RPM
 
 // Servo ramp times
 uint16_t CH1_RAMP_TIME = 0; // always 0 for now
 uint16_t CH2_RAMP_TIME = 0; // always 0 for now
 uint16_t CH3_RAMP_TIME = 0; // always 0 for now
-uint16_t CH4_RAMP_TIME = 3000; // 2000 for swing motor protection
+uint16_t CH4_RAMP_TIME = 3500; // 2000 for swing motor protection
 
 #endif

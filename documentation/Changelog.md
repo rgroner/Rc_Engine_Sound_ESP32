@@ -1,8 +1,18 @@
 # Changelog
 
+### Known issues:
+- PWM mode not working above v9.11.0
+
 ### Todo:
 - Remove in vehicle files: XENON_LIGHTS, LED_INDICATORS, INDICATOR_DIR, doubleFlashBlueLight
 - Add to EEPROM & select box: DOUBLE_CLUTCH and other transmission options
+
+### 9.14.0-b7
+- REVERSING_LOOP now tested and working properly
+
+### 9.14.0-b6
+- Audio2Header.html now including "reversing beep" category
+- REVERSING_LOOP in the reversing beep file allows to use sounds with different start beep (see CATreversingBeep.h)
 
 ### 9.14.0-b5
 - Servo stroke limitation bug in EXCAVATOR_MODE fixed
