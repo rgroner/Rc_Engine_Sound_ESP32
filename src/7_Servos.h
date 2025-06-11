@@ -20,7 +20,7 @@
  */
 
 // Select the vehicle configuration you have:
- #define SERVOS_DEFAULT // <------- Select (remove //) one of the remote configurations below
+// #define SERVOS_DEFAULT // <------- Select (remove //) one of the remote configurations below
 // #define SERVOS_LANDY_MN_MODEL
 // #define SERVOS_LANDY_DOUBLE_EAGLE
 // #define SERVOS_C34
@@ -32,7 +32,7 @@
 // #define SERVOS_MECCANO_DUMPER
 // #define SERVOS_OPEN_RC_TRACTOR
 // NOTICE: The following profiles are for EXCAVATOR_MODE only! ---------------------
-// #define SERVOS_EXCAVATOR // For excavators with electric actuators
+ #define SERVOS_EXCAVATOR // For excavators with electric actuators
 // #define SERVOS_HYDRAULIC_EXCAVATOR // For hydraulic excavators
 
 // Default servo configuration profile -------------------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ uint16_t STEERING_RAMP_TIME = 0; // 0 = fastest speed, enlarge it to around 3000
 // Electric excavator servo configuration profile -------------------------------------------------------------------------------------------
 #ifdef SERVOS_EXCAVATOR
 
-boolean boomDownwardsHydraulic = false; // hydraulic load sound as well for boom downwards
+boolean boomDownwardsHydraulic = true; // hydraulic load sound as well for boom downwards
 boolean reverseBoomSoundDirection = false; // reverse sound direction, if needed (for example if hoses can't be swapped)
 
 // Servo frequency
