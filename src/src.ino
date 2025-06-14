@@ -240,10 +240,12 @@ rcTrigger functionR100u(200); // 200ms required!
 rcTrigger functionR100d(100);
 rcTrigger functionR75u(300); // 300ms required!
 rcTrigger functionR75d(300); // 300ms required!
+
 rcTrigger functionL100l(100);
 rcTrigger functionL100r(100);
 rcTrigger functionL75l(300); // 300ms required!
 rcTrigger functionL75r(300); // 300ms required!
+rcTrigger functionL50l(300); // 300ms required!
 
 // Latching 2 position
 rcTrigger mode1Trigger(100);
@@ -485,6 +487,7 @@ volatile boolean lightsOn = false;             // Lights on
 volatile boolean headLightsFlasherOn = false;  // Headlights flasher impulse (Lichthupe)
 volatile boolean headLightsHighBeamOn = false; // Headlights high beam (Fernlicht)
 volatile boolean blueLightTrigger = false;     // Bluelight on (Blaulicht)
+volatile boolean rotatingBeaconTrigger = false;// Rotating beacon on (just by enabling 5V)
 boolean indicatorLon = false;                  // Left indicator (Blinker links)
 boolean indicatorRon = false;                  // Right indicator (Blinker rechts)
 boolean fogLightOn = false;                    // Fog light is on
@@ -4035,7 +4038,7 @@ void led()
 
 #if not defined SPI_DASHBOARD
   // Beacons (blue light) ----
-#if not defined TRACKED_MODE // Normal beacons mode
+#if not defined TRACKED_MODE && not defined ROTATINGBEACON_ON_B1// Normal beacons mode
   if (blueLightTrigger)
   {
     if (flashingBlueLight)
@@ -4054,8 +4057,8 @@ void led()
     beaconLight2.off();
     beaconLight1.off();
   }
-#else // Beacons used for tank cannon fire simulation flash in TRACKED_MODE
-  if (cannonFlash)
+#else // Beacons used for tank cannon fire simulation flash in TRACKED_MODE od for rotating beacon, if ROTATINGBEACON_ON_B1 is defined
+  if (cannonFlash || rotatingBeaconTrigger)
     beaconLight1.on();
   else
     beaconLight1.off();
@@ -4638,9 +4641,15 @@ void esc()
   }
   else
   { // Virtual inertia mode -----
+#if defined LOADER_MODE
+    // calulate throttle dependent brake & acceleration steps
+    brakeRampRate = map(currentThrottle, 0, 500, escAccelerationSteps, escBrakeSteps);
+    driveRampRate = map(currentThrottle, 0, 500, escAccelerationSteps, escAccelerationSteps);
+#else
     // calulate throttle dependent brake & acceleration steps
     brakeRampRate = map(currentThrottle, 0, 500, 1, escBrakeSteps);
     driveRampRate = map(currentThrottle, 0, 500, 1, escAccelerationSteps);
+#endif
   } // ----------------------------------------------------
 
   // Emergency ramp rates for falisafe
@@ -5203,7 +5212,7 @@ void rcTriggerRead()
     lightsStateLock = !lightsStateLock;
   }
 
-  // Toggling high / low beam, if dual rate @100% and short in position
+  // Toggling high / low beam, if dual rate @100% and long in position
   static bool beamStateLock;
   if (functionR100u.toggleLong(pulseWidth[5], 1000) != beamStateLock)
   {
@@ -5262,10 +5271,18 @@ void rcTriggerRead()
   }
 #endif
 
+// Toggling rotating beacon (just switching 5V on and off), if dual rate @50% and long in position. Controlled by FRSKY Tandem XE and touchscreen
+  static bool RotatingBeaconStateLock;
+  if (functionL50l.toggleLong(pulseWidth[6], 1750) != RotatingBeaconStateLock)
+  {
+    rotatingBeaconTrigger = !rotatingBeaconTrigger;
+    RotatingBeaconStateLock = !RotatingBeaconStateLock;
+  }
+
   // Couple / uncouple 5th wheel, if dual rate @75% and long in position -----
   static bool fifthWheelStateLock;
   if (driveState == 0)
-  { // Only allow change, if vehicle stopped!
+  { // Only allow change, if vehicle stopped!NumberOfAutomaticGears
     if (functionL75r.toggleLong(pulseWidth[6], 1850) != fifthWheelStateLock)
     {
       unlock5thWheel = !unlock5thWheel;

@@ -59,7 +59,7 @@
 // General options
 // #define QUICRUN_FUSION // Linearity compensation for HOBBYWING Quicrun Fusion motor / ESC combo
 // #define QUICRUN_16BL30 // Linearity compensation for HOBBYWING Quicrun 16BL30 ESC (experimental, don't use it)
-// #define ESC_DIR // uncomment this, if your motor is spinning in the wrong direction
+ #define ESC_DIR // uncomment this, if your motor is spinning in the wrong direction
 
 /* RZ7886 motor driver IC instead of an ESC. Not in combination with #define THIRD_BRAKELIGHT or #define TRAILER_LIGHTS_TRAILER_PRESENCE_SWITCH_DEPENDENT
 Order the PCB here: https://www.pcbway.com/project/shareproject/RZ7886_based_ESC_for_ESP32_Sound_and_Light_Controller_f8f4a805.html
@@ -83,7 +83,7 @@ uint8_t RZ7886_DRAGBRAKE_DUTY = 100; // 0 - 100%. 100% = max. brake power while 
 // This prevents the vehicle from rolling back as long as brake is applied. 0 = no effect, ca. 20 = strong effect.
 // How it works? Prevents the ESC from entering the "drag brake range"
 // Warning: vehicle may be unable to stop, if too high, especially when driving downhill! NEVER more than 20!
-uint16_t brakeMargin = 10; // For RZ7886 motor driver and 370 motor = 10, otherwise 0
+uint16_t brakeMargin = 0; // For RZ7886 motor driver and 370 motor = 10, otherwise 0
 
 // Top speed adjustment:
 // Usually 500 ( = 1000 - 2000 microseconds output or -45° to 45° servo angle) Enlarge it, if your vehicle is too fast

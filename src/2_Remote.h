@@ -5,7 +5,8 @@
 // #define FLYSKY_FS_I6S                // <------- Flysky FS-i6s
 // #define FLYSKY_FS_I6S_LOADER     // <------- Flysky FS-i6s for BURNIE222 Volvo L120H loader (use IBUS communication setting)
 // #define FLYSKY_FS_I6S_EXCAVATOR // <------- Flysky FS-i6s for KABOLITE K336 hydraulic excavator (use IBUS communication setting)
- #define FRSKY_TANDEM_EXCAVATOR // <------- Frsky Tandem XE for hydraulic excavator (use SBUS communication setting)
+// #define FRSKY_TANDEM_EXCAVATOR // <------- Frsky Tandem XE for hydraulic excavator (use SBUS communication setting)
+ #define FRSKY_TANDEM_HARMONY_LOADER // <------- Frsky Tandem XE for Lukas Cajkar Harmony 370 (use SBUS communication setting)
 // #define FLYSKY_GT5              // <------- Flysky GT5 / Reely GT6 EVO / Absima CR6P
 // #define RGT_EX86100             // <------- MT-305 remote delivered with RGT EX86100 crawler (use PWM communication setting)
 // #define GRAUPNER_MZ_12          // <------- Graupner MZ-12 PRO
@@ -418,6 +419,77 @@ boolean channelAutoZero[14] = {
     true,  // CH6
     true,  // CH7
     true,  // CH8
+    false, // CH9
+    false, // CH10
+    false, // CH11
+    false, // CH12
+    false  // CH13
+};
+
+// Channels signal range calibration -----
+const uint16_t pulseNeutral = 30;
+const uint16_t pulseSpan = 480;
+
+// Automatic or manual modes -----
+// #define AUTO_LIGHTS
+// #define AUTO_ENGINE_ON_OFF
+// #define AUTO_INDICATORS
+
+// SBUS mode ----
+boolean sbusInverted = true; // true = standard (non inverted) SBUS signal
+
+#endif
+
+// Frsky Tandem XE remote configuration profile (for loaders only) --------------------------------------------------------------------------------------
+#ifdef FRSKY_TANDEM_HARMONY_LOADER
+
+// NOTE: The vehicle file needs to contain #define LOADER_MODE
+
+// Channel assignment (use NONE for non existing channels!)
+// Remote channel #######   // Sound controller channel ##########################################
+#define STEERING 4           // CH1 bucket
+#define GEARBOX 3            // CH2 lift
+#define THROTTLE 1           // CH3 throttle & brake (right throttle in tracked mode)
+#define HORN 10               //CH4 horn and bluelight / siren slider right
+#define FUNCTION_R 11        // CH5 jake brake, high / low beam, headlight flasher, engine on / off VRB
+#define FUNCTION_L 12        // CH6 indicators, hazards VRA
+#define POT2 NONE            // CH7 pot 2
+#define MODE1 NONE           // CH8 mode 1 switch
+#define MODE2 NONE           // CH9 mode 2 switch
+#define MOMENTARY1 NONE      // CH10
+#define HAZARDS NONE         // CH11
+#define INDICATOR_LEFT NONE  // CH12
+#define INDICATOR_RIGHT NONE // CH13
+
+// Channels reversed or not
+boolean channelReversed[14] = {
+    false, // CH0 (unused)
+    true, // CH1
+    true, // CH2
+    false, // CH3
+    false, // CH4
+    true,  // CH5
+    false, // CH6
+    false, // CH7
+    false, // CH8
+    false, // CH9
+    false, // CH10
+    false, // CH11
+    false, // CH12
+    false  // CH13
+};
+
+// Channels auto zero adjustment or not (don't use it for channels without spring centered neutral position, switches or unused channels)
+boolean channelAutoZero[14] = {
+    false, // CH0 (unused)
+    true,  // CH1
+    true, // CH2
+    true,  // CH3
+    false, // CH4
+    false,  // CH5
+    false,  // CH6
+    false, // CH7
+    false, // CH8
     false, // CH9
     false, // CH10
     false, // CH11

@@ -33,6 +33,7 @@ uint8_t neopixelMode = 2; // See above
 
 // These light settings are adjustabale during compile time only ---------------------------------------------------------------------------------------------
 #define THIRD_BRAKELIGHT // if defined, pin 32 is used for a third brake light, otherwise for a trailer presence switch (pulled to GND = no trailer attached)
+#define ROTATINGBEACON_ON_B1 // A rotating beacon is connected to the beacon 1 connector, which is enabled by just switching on the 5V supply
 
 // These light options are adjustable on the configuration website and stored in the EEPROM -----------------------------------------------------------------
 bool noCabLights = false;                 // The cablights step in the lights sequence is skipped, if true
@@ -41,7 +42,7 @@ bool xenonLights = false;                 // Headlights will show a xenon bulb i
 bool flickeringWileCranking = false;       // if true: The lights will flicker a bit during engine cranking, otherwise they are just a bit dimmed
 bool ledIndicators = false;               // indicators are switching "hard" (without fading like an incandescent bulb), if true (was LED_INDICATORS)
 bool swap_L_R_indicators = false;         // If you want to swap L & R indicators
-bool indicatorsAsSidemarkers = true;      // "US Mode" The indicators are used as side markers as well. This is commonly used in US trucks.
+bool indicatorsAsSidemarkers = false;      // "US Mode" The indicators are used as side markers as well. This is commonly used in US trucks.
 bool separateFullBeam = false;            // The full beam is a separate bulb, connected to roof lights pin. Connect roof lights to side lights in this case
 bool flashingBlueLight = true;            // double flash blue lights if "true", "rotating" beacons if "false"
 bool hazardsWhile5thWheelUnlocked = true; // Hazards on, if 5th wheel is unlocked
@@ -51,6 +52,6 @@ uint8_t cabLightsBrightness = 100;      // Usually 255, 100 for Actros & Ural
 uint8_t sideLightsBrightness = 140;     // Usually 200, 100 for WPL C44, 50 for Landy, 100 for P407, 150 for Actros
 uint8_t rearlightDimmedBrightness = 30; // tailligt brightness, if not braking, about 30
 uint8_t rearlightParkingBrightness = 5; // 0, if you want the taillights being off, if side lights are on, or about 5 if you want them on (0 for US Mode)
-uint8_t headlightParkingBrightness = 0; // 0, if you want the headlights being off, if side lights are on, or about 5 if you want them on (0 for US Mode)
+uint8_t headlightParkingBrightness = 5; // 0, if you want the headlights being off, if side lights are on, or about 5 if you want them on (0 for US Mode)
 uint8_t reversingLightBrightness = 140; // Around 140, 50 for Landy & Ural
 uint8_t fogLightBrightness = 255;       // Around 200
