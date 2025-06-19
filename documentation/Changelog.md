@@ -7,6 +7,12 @@
 - Remove in vehicle files: XENON_LIGHTS, LED_INDICATORS, INDICATOR_DIR, doubleFlashBlueLight
 - Add to EEPROM & select box: DOUBLE_CLUTCH and other transmission options
 
+### 9.14.0-b7
+- Hitachi ZW 370-6 wheel loader added
+- FRSKY_TANDEM_HARMONY_LOADER remote profile added for TANDEM XE with touchscreen
+- ESC settings added: HYDROSTATIC_MODE, directionChangeLimit
+- Lights settings added: ROTATINGBEACON_ON_B1, INDICATOR_TOGGLING_MODE
+
 ### 9.14.0-b6
 - Audio2Header.html now including "reversing beep" category
 - REVERSING_LOOP in the reversing beep file allows to use sounds with different start beep (see CATreversingBeep.h)

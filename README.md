@@ -103,8 +103,7 @@ Compact version for excavator (IBUS & sound only, supplied by 6V BEC)
 - Wireless configuration website 192.168.4.1
 
 ## On the todo list:
-- cornering lights (on the beacon outputs)
-- Hazards switching on, if engine off in AUTO_LIGHTS mode
+- Adding more features for function models
 
 ## Known issues:
 - Arduino IDE 1.8.7 or older is not supported and will cause compiler errors!

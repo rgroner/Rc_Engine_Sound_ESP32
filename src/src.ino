@@ -17,7 +17,7 @@
    Arduino IDE is supported as well, but I recommend to use VS Code, because libraries and boards are managed automatically.
 */
 
-char codeVersion[] = "9.14.0-b6"; // Software revision.
+char codeVersion[] = "9.14.0-b7"; // Software revision.
 
 //
 // =======================================================================================================
@@ -482,16 +482,18 @@ uint16_t currentSpeed = 0;         // 0 - 500 (current ESC power)
 volatile bool crawlerMode = false; // Crawler mode intended for crawling competitons (withouth sound and virtual inertia)
 
 // Lights
-int8_t lightsState = 0;                        // for lights state machine
-volatile boolean lightsOn = false;             // Lights on
-volatile boolean headLightsFlasherOn = false;  // Headlights flasher impulse (Lichthupe)
-volatile boolean headLightsHighBeamOn = false; // Headlights high beam (Fernlicht)
-volatile boolean blueLightTrigger = false;     // Bluelight on (Blaulicht)
-volatile boolean rotatingBeaconTrigger = false;// Rotating beacon on (just by enabling 5V)
-boolean indicatorLon = false;                  // Left indicator (Blinker links)
-boolean indicatorRon = false;                  // Right indicator (Blinker rechts)
-boolean fogLightOn = false;                    // Fog light is on
-boolean cannonFlash = false;                   // Flashing cannon fire
+int8_t lightsState = 0;                         // for lights state machine
+volatile boolean lightsOn = false;              // Lights on
+volatile boolean headLightsFlasherOn = false;   // Headlights flasher impulse (Lichthupe)
+volatile boolean headLightsHighBeamOn = false;  // Headlights high beam (Fernlicht)
+volatile boolean blueLightTrigger = false;      // Bluelight on (Blaulicht)
+volatile boolean rotatingBeaconTrigger = false; // Rotating beacon on (just by enabling 5V)
+boolean indicatorLon = false;                   // Left indicator (Blinker links)
+boolean indicatorRon = false;                   // Right indicator (Blinker rechts)
+boolean L = false;                              // Left indicator
+boolean R = false;                              // Right indicator
+boolean fogLightOn = false;                     // Fog light is on
+boolean cannonFlash = false;                    // Flashing cannon fire
 
 // Trailer
 bool legsUp;
@@ -4038,7 +4040,7 @@ void led()
 
 #if not defined SPI_DASHBOARD
   // Beacons (blue light) ----
-#if not defined TRACKED_MODE && not defined ROTATINGBEACON_ON_B1// Normal beacons mode
+#if not defined TRACKED_MODE && not defined ROTATINGBEACON_ON_B1 // Normal beacons mode
   if (blueLightTrigger)
   {
     if (flashingBlueLight)
@@ -4561,6 +4563,14 @@ int8_t escPulse()
   return escPulse;
 }
 
+boolean lowThrottle()
+{ // Throttle stick is in a spot around neutral, allowing to unlock direction change
+  if (pulseWidth[3] < (pulseMaxNeutral[3] + directionChangeLimit) && pulseWidth[3] > (pulseMinNeutral[3] - directionChangeLimit))
+    return true;
+  else
+    return false;
+}
+
 // If you connect your ESC to pin 33, the vehicle inertia is simulated. Direct brake (crawler) ESC required
 // *** WARNING!! Do it at your own risk!! There is a falisafe function in case, the signal input from the
 // receiver is lost, but if the ESP32 crashes, the vehicle could get out of control!! ***
@@ -4766,7 +4776,11 @@ void esc()
       if (escPulseWidth < pulseZero[3] && pulse() == 0)
         escPulseWidth = pulseZero[3]; // Overflow prevention!
 
+#if not defined HYDROSTATIC_MODE
       if (pulse() == 0 && escPulse() == 1 && !neutralGear)
+#else
+      if (escPulse() == 0 && lowThrottle() && !neutralGear) // Allow direct acceleration in opposite direction after braking
+#endif
       {
         driveState = 1; // Driving forward
         airBrakeTrigger = true;
@@ -4828,7 +4842,11 @@ void esc()
       if (escPulseWidth > pulseZero[3] && pulse() == 0)
         escPulseWidth = pulseZero[3]; // Overflow prevention!
 
+#if not defined HYDROSTATIC_MODE
       if (pulse() == 0 && escPulse() == -1 && !neutralGear)
+#else
+      if (escPulse() == 0 && lowThrottle() && !neutralGear) // Allow direct acceleration in opposite direction after braking
+#endif
       {
         driveState = 3; // Driving backwards
         airBrakeTrigger = true;
@@ -5109,9 +5127,6 @@ void triggerIndicators()
 
 #if not defined EXCAVATOR_MODE // Only used, if our vehicle is not an excavator!
 
-  static boolean L;
-  static boolean R;
-
 #ifdef AUTO_INDICATORS // Automatic, steering triggered indicators ********
   // detect left indicator trigger -------------
   if (pulseWidth[1] > (1500 + indicatorOn))
@@ -5131,7 +5146,9 @@ void triggerIndicators()
   if (pulseWidth[1] > (1500 - indicatorOn / 3))
     R = false;
 
-#else // Manually triggered indicators ********
+#else
+#if not defined INDICATOR_TOGGLING_MODE
+  // Manually triggered indicators (stick operated) ********
   // detect left indicator trigger -------------
   if (pulseWidth[6] > 1900)
   {
@@ -5164,6 +5181,33 @@ void triggerIndicators()
     R = false;
     steeringOld = pulseWidth[1];
   }
+
+#else
+  // Manually triggered indicators (set / reset button operated) ********
+  static bool lockL = false;
+  static bool lockR = false;
+
+  // detect left indicator trigger -------------
+  if (pulseWidth[6] > 1900 && !lockL)
+  {
+    lockL = true;
+    L = !L;
+    R = false;
+  }
+  if (pulseWidth[6] < 1600)
+    lockL = false;
+
+  // detect right indicator trigger -------------
+  if (pulseWidth[6] < 1100 && !lockR)
+  {
+    lockR = true;
+    R = !R;
+    L = false;
+  }
+  if (pulseWidth[6] > 1400)
+    lockR = false;
+
+#endif
 
 #endif // End of manually triggered indicators
 
@@ -5271,7 +5315,7 @@ void rcTriggerRead()
   }
 #endif
 
-// Toggling rotating beacon (just switching 5V on and off), if dual rate @50% and long in position. Controlled by FRSKY Tandem XE and touchscreen
+  // Toggling rotating beacon (just switching 5V on and off), if dual rate @50% and long in position. Controlled by FRSKY Tandem XE and touchscreen
   static bool RotatingBeaconStateLock;
   if (functionL50l.toggleLong(pulseWidth[6], 1750) != RotatingBeaconStateLock)
   {

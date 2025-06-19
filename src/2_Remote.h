@@ -499,7 +499,7 @@ boolean channelAutoZero[14] = {
 
 // Channels signal range calibration -----
 const uint16_t pulseNeutral = 30;
-const uint16_t pulseSpan = 480;
+const uint16_t pulseSpan = 495;
 
 // Automatic or manual modes -----
 // #define AUTO_LIGHTS

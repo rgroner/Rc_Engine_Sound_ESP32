@@ -33,7 +33,8 @@ uint8_t neopixelMode = 2; // See above
 
 // These light settings are adjustabale during compile time only ---------------------------------------------------------------------------------------------
 #define THIRD_BRAKELIGHT // if defined, pin 32 is used for a third brake light, otherwise for a trailer presence switch (pulled to GND = no trailer attached)
-#define ROTATINGBEACON_ON_B1 // A rotating beacon is connected to the beacon 1 connector, which is enabled by just switching on the 5V supply
+#define ROTATINGBEACON_ON_B1 // A rotating beacon which is enabled by just switching on the 5V supply, is connected to the beacon 1 connector, controlled by CH6 @ 50%
+#define INDICATOR_TOGGLING_MODE // The indicators are toggled on and off, each time the trigger signal is detected. For vehicles in loader mode
 
 // These light options are adjustable on the configuration website and stored in the EEPROM -----------------------------------------------------------------
 bool noCabLights = false;                 // The cablights step in the lights sequence is skipped, if true

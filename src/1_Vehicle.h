@@ -61,7 +61,7 @@
 
 // Wheel Loaders -------
 // #include "vehicles/VolvoL120H.h"
-#include "vehicles/HitachiZW370.h"
+#include "vehicles/HitachiZW370.h" // Hitachi ZW 370-6 heavy wheel loader (for Lukas Cajkar Harmony 370 3D printed loader)
 
 // Articulated Dump Trucks -------
 // #include "vehicles/CAT730.h" // Caterpillar 730 heavy dump truck
