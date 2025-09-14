@@ -7,6 +7,11 @@
 - Remove in vehicle files: XENON_LIGHTS, LED_INDICATORS, INDICATOR_DIR, doubleFlashBlueLight
 - Add to EEPROM & select box: DOUBLE_CLUTCH and other transmission options
 
+### 9.14.0-b8
+- Rough terrain crane added
+- CRANE_MODE added
+- SBUS can now decode 16 instead of 13 channels, used for additional servo outputs in rough terrain crane
+
 ### 9.14.0-b7
 - Hitachi ZW 370-6 wheel loader added
 - FRSKY_TANDEM_HARMONY_LOADER remote profile added for TANDEM XE with touchscreen

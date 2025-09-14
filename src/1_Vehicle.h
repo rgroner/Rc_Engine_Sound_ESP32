@@ -57,14 +57,18 @@
 // #include "vehicles/Pingon14CExcavator.h" // Pingon 14C excavator (use "FLYSKY_FS_I6S_EXCAVATOR" remote profile)
 
 // Dumpers -------
-//  #include "vehicles/Benford3TonDumper.h" // Benford 3 ton dumper
+// #include "vehicles/Benford3TonDumper.h" // Benford 3 ton dumper
 
 // Wheel Loaders -------
 // #include "vehicles/VolvoL120H.h"
-#include "vehicles/HitachiZW370.h" // Hitachi ZW 370-6 heavy wheel loader (for Lukas Cajkar Harmony 370 3D printed loader)
+// #include "vehicles/HitachiZW370.h" // Hitachi ZW 370-6 heavy wheel loader (for Lukas Cajkar Harmony 370 3D printed loader)
 
 // Articulated Dump Trucks -------
 // #include "vehicles/CAT730.h" // Caterpillar 730 heavy dump truck
+
+// Rough Terrain Cranes -------
+// #include "vehicles/RoughTerrainCrane.h" // Mushroom3D Rough Terrain Crane
+ #include "vehicles/RoughTerrainCrane_Cummins.h" // Mushroom3D Rough Terrain Crane with Cummins 6BTA
 
 // US motorcycles --------
 // #include "vehicles/HarleyDavidsonFXSB.h" // Harley Davidson FXSB V2 motorcycle

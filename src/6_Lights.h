@@ -37,7 +37,7 @@ uint8_t neopixelMode = 2; // See above
 #define INDICATOR_TOGGLING_MODE // The indicators are toggled on and off, each time the trigger signal is detected. For vehicles in loader mode
 
 // These light options are adjustable on the configuration website and stored in the EEPROM -----------------------------------------------------------------
-bool noCabLights = false;                 // The cablights step in the lights sequence is skipped, if true
+bool noCabLights = true;                 // The cablights step in the lights sequence is skipped, if true
 bool noFogLights = false;                 // The foglights step in the lights sequence is skipped, if true
 bool xenonLights = false;                 // Headlights will show a xenon bulb ignition flash, if true
 bool flickeringWileCranking = false;       // if true: The lights will flicker a bit during engine cranking, otherwise they are just a bit dimmed

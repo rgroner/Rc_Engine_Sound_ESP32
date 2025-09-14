@@ -244,6 +244,7 @@ volatile int sound1VolumePercentage = 100; // Adjust the sound1 volume (usually 
 // Choose the reversing beep sound --------
 volatile int reversingVolumePercentage = 70; // Adjust the reversing sound volume (usually = 70%)
 #include "sounds/TruckReversingBeep.h"       // 1000Hz peep sound
+// #include "sounds/CATreversingBeep.h" // CAT beep sound
 
 // Choose the indicator / turn signal options --------
 volatile int indicatorVolumePercentage = 100; // Adjust the indicator sound volume (usually = 100%)

@@ -17,7 +17,7 @@
    Arduino IDE is supported as well, but I recommend to use VS Code, because libraries and boards are managed automatically.
 */
 
-char codeVersion[] = "9.14.0-b7"; // Software revision.
+char codeVersion[] = "9.14.0-b8"; // Software revision.
 
 //
 // =======================================================================================================
@@ -346,7 +346,7 @@ uint32_t maxIbusRpmPercentage = 320; // Limit required to prevent controller fro
 volatile boolean couplerSwitchInteruptLatch; // this is enabled, if the coupler switch pin change interrupt is detected
 
 // Control input signals
-#define PULSE_ARRAY_SIZE 14                // 13 channels (+ the unused CH0)
+#define PULSE_ARRAY_SIZE 17                // 16 channels (+ the unused CH0)
 uint16_t pulseWidthRaw[PULSE_ARRAY_SIZE];  // Current RC signal RAW pulse width [X] = channel number
 uint16_t pulseWidthRaw2[PULSE_ARRAY_SIZE]; // Current RC signal RAW pulse width with linearity compensation [X] = channel number
 uint16_t pulseWidthRaw3[PULSE_ARRAY_SIZE]; // Current RC signal RAW pulse width before averaging [X] = channel number
@@ -365,7 +365,7 @@ uint16_t pulseLimit = 1100;           // pulseZero +/- this value (1100)
 uint16_t pulseMinValid = 700;         // The minimum valid pulsewidth (was 950)
 uint16_t pulseMaxValid = 2300;        // The maximum valid pulsewidth (was 2050)
 bool autoZeroDone;                    // Auto zero offset calibration done
-#define NONE 16                       // The non existing "Dummy" channel number (usually 16) TODO
+#define NONE 0                        // The non existing "Dummy" channel number (usually 0) TODO, was 16
 
 volatile boolean failSafe = false; // Triggered in emergency situations like: throttle signal lost etc.
 
@@ -422,6 +422,7 @@ volatile uint16_t rpmDependentWastegateVolume = 0;    // wastegate volume accord
 volatile uint16_t tireSquealVolume = 0;               // Tire squeal volume according to speed and cornering radius
 // for excavator mode:
 volatile uint16_t hydraulicPumpVolume = 0;             // hydraulic pump volume
+volatile uint16_t hydraulicPumpVolumeArray[17];        // hydraulic pump volume
 volatile uint16_t hydraulicFlowVolume = 0;             // hydraulic flow volume
 volatile uint16_t trackRattleVolume = 0;               // track rattling volume
 volatile uint16_t hydraulicDependentKnockVolume = 100; // engine Diesel knock volume according to hydraulic load
@@ -433,14 +434,15 @@ volatile int16_t masterVolume = 100; // Master volume percentage
 volatile uint8_t dacOffset = 0;      // 128, but needs to be ramped up slowly to prevent popping noise, if switched on
 
 // Throttle
-int16_t currentThrottle = 0;      // 0 - 500 (Throttle trigger input)
-int16_t currentThrottleFaded = 0; // faded throttle for volume calculations etc.
+int16_t currentThrottle = 0;          // 0 - 500 (Throttle trigger input)
+int16_t currentThrottleHydraulic = 0; // 0 - 500 (Throttle requested by hydraulics)
+int16_t currentThrottleFaded = 0;     // faded throttle for volume calculations etc.
 
 // Engine
 const int16_t maxRpm = 500;       // always 500
 const int16_t minRpm = 0;         // always 0
 int32_t currentRpm = 0;           // 0 - 500 (signed required!)
-int32_t targetHydraulicRpm[3];    // The hydraulic RPM target for loader mode
+int32_t targetHydraulicRpm[17];   // The hydraulic RPM target for loader mode & crane mode
 volatile uint8_t engineState = 0; // Engine state
 enum EngineState                  // Engine state enum
 {
@@ -851,7 +853,7 @@ void IRAM_ATTR variablePlaybackTimer()
     }
 
     // Hydraulic pump sound -----------------------
-#if defined EXCAVATOR_MODE || defined DUMP_BED
+#if defined EXCAVATOR_MODE || defined DUMP_BED || defined CRANE_MODE
     if (curHydraulicPumpSample < hydraulicPumpSampleCount - 1)
     {
       f = (hydraulicPumpSamples[curHydraulicPumpSample] * hydraulicPumpVolumePercentage / 100 * hydraulicPumpVolume / 100);
@@ -1255,9 +1257,9 @@ void IRAM_ATTR fixedPlaybackTimer()
   {
 #if defined RPM_DEPENDENT_KNOCK // knock volume also depending on engine rpm
     b7 = (knockSamples[curDieselKnockSample] * dieselKnockVolumePercentage / 100 * throttleDependentKnockVolume / 100 * rpmDependentKnockVolume / 100);
-#elif defined EXCAVATOR_MODE || defined DUMP_BED // knock volume also depending on hydraulic load
+#elif defined EXCAVATOR_MODE || defined DUMP_BED || defined CRANE_MODE // knock volume also depending on hydraulic load
     b7 = (knockSamples[curDieselKnockSample] * dieselKnockVolumePercentage / 100 * throttleDependentKnockVolume / 100 * hydraulicDependentKnockVolume / 100);
-#else                                            // Just depending on throttle
+#else                                                                  // Just depending on throttle
     b7 = (knockSamples[curDieselKnockSample] * dieselKnockVolumePercentage / 100 * throttleDependentKnockVolume / 100);
 #endif
     curDieselKnockSample++;
@@ -1311,7 +1313,7 @@ void IRAM_ATTR fixedPlaybackTimer()
 
   // Group "c" (excavator sounds) **********************************************************************
 
-#if defined EXCAVATOR_MODE || defined LOADER_MODE || defined DUMP_BED
+#if defined EXCAVATOR_MODE || defined LOADER_MODE || defined CRANE_MODE || defined DUMP_BED
 
   // Hydraulic fluid flow sound -----------------------
   if (engineRunning && curHydraulicFlowSample < hydraulicFlowSampleCount - 1)
@@ -2308,6 +2310,9 @@ void readSbusCommands()
     pulseWidthRaw[11] = map(SBUSchannels[HAZARDS - 1], 172, 1811, 1000, 2000);         // CH11
     pulseWidthRaw[12] = map(SBUSchannels[INDICATOR_LEFT - 1], 172, 1811, 1000, 2000);  // CH12
     pulseWidthRaw[13] = map(SBUSchannels[INDICATOR_RIGHT - 1], 172, 1811, 1000, 2000); // CH13
+    pulseWidthRaw[14] = map(SBUSchannels[CH_14 - 1], 172, 1811, 1000, 2000);           // CH14
+    pulseWidthRaw[15] = map(SBUSchannels[CH_15 - 1], 172, 1811, 1000, 2000);           // CH15
+    pulseWidthRaw[16] = map(SBUSchannels[CH_16 - 1], 172, 1811, 1000, 2000);           // CH16
   }
 
   if (sbusInit)
@@ -2703,15 +2708,16 @@ bool beaconControl(uint8_t pulses)
 
 //
 // =======================================================================================================
-// MCPWM SERVO RC SIGNAL OUTPUT (BUS communication mode only)
+// MCPWM SERVO RC SIGNAL OUTPUT (BUS communication mode only, depending on servo definition)
 // =======================================================================================================
 //
 // See: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/mcpwm.html#configure
 
 void mcpwmOutput()
 {
-#if not defined SERVOS_EXCAVATOR && not defined SERVOS_HYDRAULIC_EXCAVATOR // Servo outputs, if not used in excavator servo mode **************************
-  if (autoZeroDone)                                                        // Only generate servo signals, if auto zero was successful!
+#if not defined SERVOS_EXCAVATOR && not defined SERVOS_HYDRAULIC_EXCAVATOR && not defined SERVOS_CRANE // Servo outputs, if not used in special vehicle servo mode **********************
+
+  if (autoZeroDone) // Only generate servo signals, if auto zero was successful!
   {
 
     // Steering CH1 **********************
@@ -2896,6 +2902,12 @@ void mcpwmOutput()
     Serial.printf("-------------------------------------\n");
   }
 #endif // SERVO_DEBUG
+
+#elif defined SERVOS_CRANE // In crane mode, the servo outputs 1-4 are working as additional receiver outputs only, based on decoded SBUS signals *****************************************
+  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, pulseWidth[13]); // CH13
+  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, pulseWidth[14]); // CH14
+  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, pulseWidth[15]); // CH15
+  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, pulseWidth[16]); // CH16
 
 #else // Servo outputs, if used in excavator servo mode. Including delay to simulate inertia **********************************************************
   if (autoZeroDone) // Only generate servo signals, if auto zero was successful!
@@ -3556,7 +3568,8 @@ void mapThrottle()
 
     // Calculate throttle dependent engine idle volume
     if (!escIsBraking && !brakeDetect && engineRunning)
-      throttleDependentVolume = map(currentThrottleFaded, 0, 500, engineIdleVolumePercentage, fullThrottleVolumePercentage);
+      // throttleDependentVolume = map(currentThrottleFaded, 0, 500, engineIdleVolumePercentage, fullThrottleVolumePercentage);
+      throttleDependentVolume = map(max(currentThrottleFaded, currentThrottleHydraulic), 0, 500, engineIdleVolumePercentage, fullThrottleVolumePercentage);
     // else throttleDependentVolume = engineIdleVolumePercentage; // TODO
     else
     {
@@ -3568,7 +3581,8 @@ void mapThrottle()
 
     // Calculate throttle dependent engine rev volume
     if (!escIsBraking && !brakeDetect && engineRunning)
-      throttleDependentRevVolume = map(currentThrottleFaded, 0, 500, engineRevVolumePercentage, fullThrottleVolumePercentage);
+      // throttleDependentRevVolume = map(currentThrottleFaded, 0, 500, engineRevVolumePercentage, fullThrottleVolumePercentage);
+      throttleDependentRevVolume = map(max(currentThrottleFaded, currentThrottleHydraulic), 0, 500, engineRevVolumePercentage, fullThrottleVolumePercentage);
     // else throttleDependentRevVolume = engineRevVolumePercentage; // TODO
     else
     {
@@ -3775,7 +3789,7 @@ void engineMassSimulation()
     if (escIsBraking && currentSpeed < clutchEngagingPoint)
       targetRpm = 0; // keep engine @idle rpm, if braking at very low speed
 
-#if defined LOADER_MODE || defined DUMP_BED
+#if defined LOADER_MODE || defined CRANE_MODE || defined DUMP_BED
     // If requested hydraulic rpm is higher, use it (for loader)
     if (targetHydraulicRpm[0] > targetRpm)
       targetRpm = targetHydraulicRpm[0];
@@ -4651,7 +4665,7 @@ void esc()
   }
   else
   { // Virtual inertia mode -----
-#if defined LOADER_MODE
+#if defined LOADER_MODE || defined CRANE_MODE
     // calulate throttle dependent brake & acceleration steps
     brakeRampRate = map(currentThrottle, 0, 500, escAccelerationSteps, escBrakeSteps);
     driveRampRate = map(currentThrottle, 0, 500, escAccelerationSteps, escAccelerationSteps);
@@ -4996,8 +5010,11 @@ unsigned long loopDuration()
 
 void triggerHorn()
 {
-
-  if (!winchEnabled && !unlock5thWheel && !hazard)
+#ifndef CRANE_MODE
+  if (!winchEnabled && !unlock5thWheel && !hazard) // Why is this?
+  #else
+  if (!winchEnabled)
+  #endif
   { // Horn & siren control mode *************
     winchPull = false;
     winchRelease = false;
@@ -5188,7 +5205,7 @@ void triggerIndicators()
   static bool lockR = false;
 
   // detect left indicator trigger -------------
-  if (pulseWidth[6] > 1900 && !lockL)
+  if (pulseWidth[6] < 2200 && pulseWidth[6] > 1900 && !lockL)
   {
     lockL = true;
     L = !L;
@@ -5198,7 +5215,7 @@ void triggerIndicators()
     lockL = false;
 
   // detect right indicator trigger -------------
-  if (pulseWidth[6] < 1100 && !lockR)
+  if (pulseWidth[6] > 800 && pulseWidth[6] < 1100 && !lockR)
   {
     lockR = true;
     R = !R;
@@ -5301,11 +5318,11 @@ void rcTriggerRead()
   }
 #endif
 
-  // CH6 (FUNCTION_L) ----------------------------------------------------------------------
+// CH6 (FUNCTION_L) ----------------------------------------------------------------------
 
-  // Indicators are triggered in triggerIndicators()
+// Indicators are triggered in triggerIndicators()
 
-  // Hazards on / off, if dual rate @75% and long in position -----
+// Hazards on / off, if dual rate @75% and long in position -----
 #ifndef AUTO_INDICATORS
   static bool hazardStateLock;
   if (functionL75l.toggleLong(pulseWidth[6], 1150) != hazardStateLock)
@@ -5335,7 +5352,7 @@ void rcTriggerRead()
   }
 
   // Latching 2 position switches ******************************************************************
-
+#if not defined CRANE_MODE
   // Mode 1 ----
   mode1 = mode1Trigger.onOff(pulseWidth[8], 1800, 1200); // CH8 (MODE1)
 #ifdef TRANSMISSION_NEUTRAL
@@ -5344,6 +5361,7 @@ void rcTriggerRead()
 
   // Mode 2 ----
   mode2 = mode2Trigger.onOff(pulseWidth[9], 1800, 1200); // CH9 (MODE2)
+#endif
 
 #if defined MODE2_WINCH // Winch control mode
   if (mode2)
@@ -6044,14 +6062,73 @@ void loaderControl()
     targetHydraulicRpm[1] = 0;
 
   targetHydraulicRpm[0] = targetHydraulicRpm[1] + targetHydraulicRpm[2];
+  currentThrottleHydraulic = targetHydraulicRpm[0];
   // Serial.println(targetHydraulicRpm[0]);
 
-  // Calculate zylinder speed dependent hydraulic flow volume ----
+  // Calculate cylinder speed dependent hydraulic flow volume ----
   // Boom (downwards) ---
   if (pulseWidth[2] > pulseMaxNeutral[2])
     hydraulicFlowVolume = map(pulseWidth[2], pulseMaxNeutral[2], (pulseMax[2] - 200), 0, 100);
   else
     hydraulicFlowVolume = 0;
+}
+
+//
+// =======================================================================================================
+// CRANE CONTROL
+// =======================================================================================================
+//
+
+// Sub function
+void hydraulicSound(int i, int rpm, int rpmRev, int vol, int volRev)
+{
+  if (pulseWidth[i] < pulseMinNeutral[i])
+  {
+    targetHydraulicRpm[i] = map(pulseWidth[i], pulseMinNeutral[i], (pulseMin[i]), 0, rpm);
+    hydraulicPumpVolumeArray[i] = map(pulseWidth[i], pulseMinNeutral[i], (pulseMin[i]), 0, vol);
+  }
+  else if (pulseWidth[i] > pulseMaxNeutral[i])
+  {
+    targetHydraulicRpm[i] = map(pulseWidth[i], pulseMaxNeutral[i], pulseMax[i], 0, rpmRev);
+    hydraulicPumpVolumeArray[i] = map(pulseWidth[i], pulseMaxNeutral[i], pulseMax[i], 0, volRev);
+  }
+  else
+  {
+    targetHydraulicRpm[i] = 0;
+    hydraulicPumpVolumeArray[i] = 0;
+  }
+  // targetHydraulicRpm[0] += targetHydraulicRpm[i];
+  // hydraulicPumpVolume += hydraulicPumpVolumeArray[i];
+  // currentThrottleHydraulic = targetHydraulicRpm[0];
+}
+
+void craneControl()
+{
+  // Calculate pump rpm --------------------------
+  hydraulicSound(1, 300, 0, 50, 0);       // Boom lift (increase rpm upwards only)
+  hydraulicSound(2, 300, 300, 50, 50);    // Boom extension
+  hydraulicSound(8, 250, 250, 50, 50);    // Swing
+  hydraulicSound(7, 300, 300, 50, 50);    // Main rope
+  hydraulicSound(9, 200, 200, 50, 50);    // Fast rope
+  hydraulicSound(12, 1400, 1400, 120, 120); // Outrigger booms (more, because ESC is used @ only at about 35%)
+  hydraulicSound(13, 100, 100, 10, 10);   // Support cylinder front left
+  hydraulicSound(14, 100, 100, 10, 10);   // Support cylinder front right
+  hydraulicSound(15, 100, 100, 10, 10);   // Support cylinder rear left
+  hydraulicSound(16, 100, 100, 10, 10);   // Support cylinder rear right
+
+  targetHydraulicRpm[0] = targetHydraulicRpm[1] + targetHydraulicRpm[2] + targetHydraulicRpm[7] + targetHydraulicRpm[8] + targetHydraulicRpm[9] + targetHydraulicRpm[12] + targetHydraulicRpm[13] + targetHydraulicRpm[14] + targetHydraulicRpm[15] + targetHydraulicRpm[16];
+  currentThrottleHydraulic = targetHydraulicRpm[0];
+  hydraulicPumpVolume = hydraulicPumpVolumeArray[1] + hydraulicPumpVolumeArray[2] + hydraulicPumpVolumeArray[7] + hydraulicPumpVolumeArray[8] + hydraulicPumpVolumeArray[9] + hydraulicPumpVolumeArray[12] + hydraulicPumpVolumeArray[13] + hydraulicPumpVolumeArray[14] + hydraulicPumpVolumeArray[15] + hydraulicPumpVolumeArray[16];
+
+  // Calculate cylinder speed dependent hydraulic flow volume ----
+  // Boom lift (downwards) ---
+  if (pulseWidth[1] > pulseMaxNeutral[1])
+    hydraulicFlowVolume = map(pulseWidth[1], pulseMaxNeutral[1], (pulseMax[1] - 200), 0, 100);
+  else
+    hydraulicFlowVolume = 0;
+
+  // Calculate hydraulic load dependent Diesel knock volume
+  hydraulicDependentKnockVolume = map(targetHydraulicRpm[0], 0, 100, 50, 100);
 }
 
 //
@@ -6259,6 +6336,11 @@ void loop()
 // Loader specific controls
 #if defined LOADER_MODE
     loaderControl();
+#endif
+
+// Loader specific controls
+#if defined CRANE_MODE
+    craneControl();
 #endif
 
 // Dump bed specific controls

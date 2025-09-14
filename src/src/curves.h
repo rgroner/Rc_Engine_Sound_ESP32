@@ -32,6 +32,10 @@ int32_t gearRatio[NumberOfAutomaticGears + 1] = {10, 30, 16, 10, 7}; // Overdriv
 uint8_t torqueconverterSlipPercentage = 100;
 int32_t gearRatio[NumberOfAutomaticGears + 1] = {10, 25, 15, 10}; // GM Turbo HydraMatic 400
 
+#elif NumberOfAutomaticGears == 2
+uint8_t torqueconverterSlipPercentage = 100;
+int32_t gearRatio[NumberOfAutomaticGears + 1] = {15, 15, 10}; // for slow, heavy construction equipment with 2 forward gears
+
 #else
 uint8_t torqueconverterSlipPercentage = 100;
 int32_t gearRatio[NumberOfAutomaticGears + 1] = {10, 10}; // Construction vehicles with hydrostatic drive and just one forward gear

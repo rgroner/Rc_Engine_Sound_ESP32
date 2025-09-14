@@ -59,9 +59,9 @@
 // General options
 // #define QUICRUN_FUSION // Linearity compensation for HOBBYWING Quicrun Fusion motor / ESC combo
 // #define QUICRUN_16BL30 // Linearity compensation for HOBBYWING Quicrun 16BL30 ESC (experimental, don't use it)
-#define ESC_DIR // uncomment this, if your motor is spinning in the wrong direction
+// #define ESC_DIR // uncomment this, if your motor is spinning in the wrong direction
 
-#define HYDROSTATIC_MODE            // ESC is able to accelerate in opposite direction after braking, even if throttle is only around the neutral position. For wheel loaders, compactors
+//#define HYDROSTATIC_MODE            // ESC is able to accelerate in opposite direction after braking, even if throttle is only around the neutral position. For wheel loaders, compactors
 uint16_t directionChangeLimit = 80; // max. throttle for automatic direction change in HYDROSTATIC_MODE. Max. 100, about 80 is OK
 
 /* RZ7886 motor driver IC instead of an ESC. Not in combination with #define THIRD_BRAKELIGHT or #define TRAILER_LIGHTS_TRAILER_PRESENCE_SWITCH_DEPENDENT
@@ -110,7 +110,7 @@ uint16_t escPulseSpan = 500; // 500 = full ESC power available, 1000 half ESC po
 // - Hobbywing 1080 ESC & RBR/C 370 motor in Carson Mercedes racing truck = 50
 // - Meccano Dumper = 0
 // - RZ7886 Driver = 0
-uint16_t escTakeoffPunch = 0;
+uint16_t escTakeoffPunch = 70;
 
 // Additional reverse speed (disconnect & reconnect battery after changing this setting):
 // Usually 0. Enlarge it, if your reverse speed is too slow.
