@@ -521,7 +521,7 @@ typedef struct struct_message
   bool rampsUp;
   bool rampsDown;
   bool beaconsOn;
-   uint16_t servoWave;
+   uint16_t chuteServoVal;
 } struct_message;
 
 // Create a struct_message called trailerData
@@ -5871,6 +5871,7 @@ void trailerControl()
     trailerData.rampsUp = rampsUp;
     trailerData.rampsDown = rampsDown;
     trailerData.beaconsOn = blueLightTrigger;
+    trailerData.chuteServoVal = pulseWidth[6]
 
     // Check, if one or more values have changed (saves battery live, prevents speaker noise and the ESP32 runs cooler)
     if (taillightOld != trailerData.tailLight ||
