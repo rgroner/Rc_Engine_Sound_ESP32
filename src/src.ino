@@ -521,6 +521,7 @@ typedef struct struct_message
   bool rampsUp;
   bool rampsDown;
   bool beaconsOn;
+   uint16_t servoWave;
 } struct_message;
 
 // Create a struct_message called trailerData
