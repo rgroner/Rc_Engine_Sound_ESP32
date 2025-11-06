@@ -26,7 +26,7 @@
 
 // Trailer 1
 bool defaultUseTrailer1 = true; // Use Trailer 1 or not
-uint8_t defaultBroadcastAddress1[] = {0xFE, 0x49, 0x01, 0x00, 0x00, 0x01}; // Generic
+uint8_t defaultBroadcastAddress1[] = {0xFE, 0x81, 0x45, 0x00, 0x00, 0x01}; // Generic
 
 // Trailer 2
 bool defaultUseTrailer2 = false; // Use Trailer 2 or not
