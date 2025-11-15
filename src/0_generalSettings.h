@@ -47,7 +47,7 @@ wifi_power_t cpType = WIFI_POWER_7dBm; // Only use values from above!
 // WiFi settings (for vehicle configuration website, open 192.168.4.1 in your browser)--------------------------------------------------------------
 // Note: if these credentials were changed, using the configuration website, 
 // you can find the current ones in the serial monitor!
-String default_ssid = "Cat560"; // Select this network
+String default_ssid = "Cat950"; // Select this network
 String default_password = "boomer4135"; // Then enter this password
 
 // Configuration website settings -------------------------------------------------------------------------------------------------------------------

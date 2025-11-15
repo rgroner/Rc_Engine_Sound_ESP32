@@ -60,7 +60,7 @@
 // #include "vehicles/Benford3TonDumper.h" // Benford 3 ton dumper
 
 // Wheel Loaders -------
-// #include "vehicles/VolvoL120H.h"
+ #include "vehicles/VolvoL120H.h"
 // #include "vehicles/HitachiZW370.h" // Hitachi ZW 370-6 heavy wheel loader (for Lukas Cajkar Harmony 370 3D printed loader)
 
 // Articulated Dump Trucks -------
@@ -68,7 +68,7 @@
 
 // Rough Terrain Cranes -------
 // #include "vehicles/RoughTerrainCrane.h" // Mushroom3D Rough Terrain Crane
- #include "vehicles/RoughTerrainCrane_Cummins.h" // Mushroom3D Rough Terrain Crane with Cummins 6BTA
+// #include "vehicles/RoughTerrainCrane_Cummins.h" // Mushroom3D Rough Terrain Crane with Cummins 6BTA
 
 // US motorcycles --------
 // #include "vehicles/HarleyDavidsonFXSB.h" // Harley Davidson FXSB V2 motorcycle
