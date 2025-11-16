@@ -263,7 +263,7 @@ boolean sbusInverted = true; // true = standard (non inverted) SBUS signal
 #define POT2 NONE               // CH7 pot 2
 #define MODE1 NONE              // CH8 mode 1 switch
 #define MODE2 NONE              // CH9 mode 2 switch
-#define MOMENTARY1 NONE      // CH10
+#define MOMENTARY1 10      // CH10
 #define HAZARDS NONE         // CH11
 #define INDICATOR_LEFT NONE  // CH12
 #define INDICATOR_RIGHT NONE // CH13

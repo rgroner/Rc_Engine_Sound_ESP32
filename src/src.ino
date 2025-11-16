@@ -530,6 +530,7 @@ typedef struct struct_message
   bool rampsDown;
   bool beaconsOn;
   uint16_t chuteServoVal;
+  uint16_t blowerTarget;
 } struct_message;
 
 // Create a struct_message called trailerData
@@ -6209,6 +6210,8 @@ void trailerControl()
   bool rampsUpOld = false;
   bool rampsdownOld = false;
   bool beaconsOnOld = false;
+  uint16_t chuteValOld = 5000;
+  uint16_t blowerValOld = 5000;
 
   if (millis() - espNowMillis > pollRate)
   { // Every 20ms
@@ -6225,6 +6228,8 @@ void trailerControl()
     rampsUpOld = trailerData.rampsUp;
     rampsdownOld = trailerData.rampsDown;
     beaconsOnOld = trailerData.beaconsOn;
+    chuteValOld = trailerData.chuteServoVal;
+    blowerValOld = trailerData.blowerTarget;
 
     // Set values to send
     // Lights (timer number in brackets, not pin number, see LED setup section)
@@ -6259,6 +6264,7 @@ void trailerControl()
     trailerData.rampsDown = rampsDown;
     trailerData.beaconsOn = blueLightTrigger;
     trailerData.chuteServoVal = pulseWidth[6];
+    trailerData.blowerTarget = pulseWidthRaw[10];
 
 
     // Check, if one or more values have changed (saves battery live, prevents speaker noise and the ESP32 runs cooler)
@@ -6271,7 +6277,9 @@ void trailerControl()
         legsdownOld != trailerData.legsDown ||
         rampsUpOld != trailerData.rampsUp ||
         rampsdownOld != trailerData.rampsDown ||
-        beaconsOnOld != trailerData.beaconsOn)
+        beaconsOnOld != trailerData.beaconsOn ||
+        chuteValOld != trailerData.chuteServoVal ||
+        blowerValOld != trailerData.blowerTarget)
     {
 
       // If so, then send message via ESP-NOW
