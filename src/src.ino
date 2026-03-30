@@ -5155,7 +5155,7 @@ void triggerIndicators()
  }
 
  return;
- 
+
 #ifdef AUTO_INDICATORS // Automatic, steering triggered indicators ********
   // detect left indicator trigger -------------
   if (pulseWidth[1] > (1500 + indicatorOn))
@@ -5409,11 +5409,11 @@ void rcTriggerRead()
   static bool engineStateLock2;
   if (driveState == 0 && (engineState == OFF || engineState == RUNNING))
   { // Only, if vehicle stopped and engine idling or off!
-    if (momentary1Trigger.toggleLong(pulseWidth[10], 2000) != engineStateLock2)
-    {
-      engineOn = !engineOn; // This lock is required, because engine on / off needs to be able to be changed in other program sections!
-      engineStateLock2 = !engineStateLock2;
-    }
+ //   if (momentary1Trigger.toggleLong(pulseWidth[10], 2000) != engineStateLock2)
+ //   {
+ //     engineOn = !engineOn; // This lock is required, because engine on / off needs to be able to be changed in other program sections!
+ //     engineStateLock2 = !engineStateLock2;
+ //   }
   }
 #endif
 
