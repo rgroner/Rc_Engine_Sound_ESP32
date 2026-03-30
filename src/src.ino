@@ -5146,6 +5146,16 @@ void triggerIndicators()
 
 #if not defined EXCAVATOR_MODE // Only used, if our vehicle is not an excavator!
 
+ if (pulseWidth[10] > 1500) {
+
+  hazard = true;
+ }
+ else {
+  hazard = false;
+ }
+
+ return;
+ 
 #ifdef AUTO_INDICATORS // Automatic, steering triggered indicators ********
   // detect left indicator trigger -------------
   if (pulseWidth[1] > (1500 + indicatorOn))

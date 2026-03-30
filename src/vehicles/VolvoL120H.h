@@ -52,7 +52,7 @@ volatile int dieselKnockAdaptiveVolumePercentage = 50; // Adjust the Diesel knoc
 #include "sounds/L120H_BaumaKnock.h" // Volvo L120H loader
 
 // Adjust the additional turbo sound (set "turboVolumePercentage" to "0", if you don't want it) --------
-volatile int turboVolumePercentage = 0; // Adjust the turbo volume (usually = 70%) 0
+volatile int turboVolumePercentage = 50; // Adjust the turbo volume (usually = 70%) 0
 volatile int turboIdleVolumePercentage = 0; // the turbo volume will be engine rpm dependent (usually = 10%)
 #include "sounds/TurboWhistle.h" // Turbo sound, playing in parallel with engine sound!
 
