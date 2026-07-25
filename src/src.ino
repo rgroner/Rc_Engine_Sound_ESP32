@@ -5507,7 +5507,15 @@ void rcTriggerRead()
     hazardStateLock = !hazardStateLock;
   }
 
-  hazard = (pulseWidth[7] <= 1500);
+  // Leaves no change of state when channel is in neutral position.
+  if (pulseWidth[7] < 1500)
+  {
+    hazard = true;
+  }
+  if (pulseWidth[7] > 1500)
+  {
+    hazard = false;
+  }
 #endif
 
 
