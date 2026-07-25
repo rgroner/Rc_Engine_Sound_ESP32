@@ -49,7 +49,7 @@ volatile int dieselKnockAdaptiveVolumePercentage = 50; // Adjust the Diesel knoc
 #include "sounds/CAT730Knock.h" // CAT 730
 
 // Adjust the additional turbo sound (set "turboVolumePercentage" to "0", if you don't want it) --------
-volatile int turboVolumePercentage = 40; // Adjust the turbo volume (usually = 70%)
+volatile int turboVolumePercentage = 70; // Adjust the turbo volume (usually = 70%)
 volatile int turboIdleVolumePercentage = 0; // the turbo volume will be engine rpm dependent (usually = 10%)
 #include "sounds/TurboWhistle.h" // Turbo sound, playing in parallel with engine sound!
 

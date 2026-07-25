@@ -5506,7 +5506,11 @@ void rcTriggerRead()
     hazard = !hazard;
     hazardStateLock = !hazardStateLock;
   }
+
+  hazard = (pulseWidth[7] <= 1500);
 #endif
+
+
 
   // Toggling rotating beacon (just switching 5V on and off), if dual rate @50% and long in position. Controlled by FRSKY Tandem XE and touchscreen
   static bool RotatingBeaconStateLock;
