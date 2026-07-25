@@ -38,7 +38,7 @@
 // #include "vehicles/ManKat.h" // MAN KAT V8 Diesel German Bundeswehr military truck
 // #include "vehicles/MagirusDeutz256.h" // Magirus Deutz 256 air cooled V8 Diesel truck
 // #include "vehicles/MagirusMercur125.h" // Magirus Mercur air cooled V6 Diesel truck
- #include "vehicles/Saurer2DM.h" // Swiss Saurer 2DM R6 Diesel truck
+// #include "vehicles/Saurer2DM.h" // Swiss Saurer 2DM R6 Diesel truck
 
 // Russian trucks --------
 // #include "vehicles/Ural4320.h" // URAL 4320 6x6 V8 Diesel military truck
@@ -73,7 +73,7 @@
 // #include "vehicles/HitachiZW370.h" // Hitachi ZW 370-6 heavy wheel loader (for Lukas Cajkar Harmony 370 3D printed loader)
 
 // Articulated Dump Trucks -------
-// #include "vehicles/CAT730.h" // Caterpillar 730 heavy dump truck
+#include "vehicles/CAT730.h" // Caterpillar 730 heavy dump truck
 // #include "vehicles/VolvoA40G.h" // Volvo A40G articulated dump truck
 
 // Rough Terrain Cranes -------

@@ -173,13 +173,13 @@ boolean sbusInverted = true; // true = standard (non inverted) SBUS signal
 
 // Channel assignment (use NONE for non existing channels!)
 // Remote channel #######   // Sound controller channel ##########################################
-#define STEERING 1           // CH1 steering
+#define STEERING 4           // CH1 steering
 #define GEARBOX 10           // CH2 3 position switch for gearbox (left throttle in tracked mode)
 #define THROTTLE 3           // CH3 throttle & brake (right throttle in tracked mode)
 #define HORN 6               // CH4 horn and bluelight / siren
 #define FUNCTION_R 2         // CH5 jake brake, high / low beam, headlight flasher, engine on / off
-#define FUNCTION_L 4         // CH6 indicators, hazards
-#define POT2 7               // CH7 pot 2 dump bed
+#define FUNCTION_L 1         // CH6 indicators, hazards
+#define POT2 5               // CH7 pot 2 dump bed
 #define MODE1 8              // CH8 mode 1 switch
 #define MODE2 NONE           // CH9 mode 2 switch
 #define MOMENTARY1 NONE      // CH10
