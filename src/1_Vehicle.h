@@ -38,7 +38,7 @@
 // #include "vehicles/ManKat.h" // MAN KAT V8 Diesel German Bundeswehr military truck
 // #include "vehicles/MagirusDeutz256.h" // Magirus Deutz 256 air cooled V8 Diesel truck
 // #include "vehicles/MagirusMercur125.h" // Magirus Mercur air cooled V6 Diesel truck
- #include "vehicles/Saurer2DM.h" // Swiss Saurer 2DM R6 Diesel truck
+// #include "vehicles/Saurer2DM.h" // Swiss Saurer 2DM R6 Diesel truck
 
 // Russian trucks --------
 // #include "vehicles/Ural4320.h" // URAL 4320 6x6 V8 Diesel military truck
@@ -60,7 +60,7 @@
 // #include "vehicles/Pingon14CExcavator.h" // Pingon 14C excavator (use "FLYSKY_FS_I6S_EXCAVATOR" remote profile)
 
 // Dozers -------
-// #include "vehicles/CaterpillarD6Dozer.h" // Caterpillar D6 Dozer
+#include "vehicles/CaterpillarD6Dozer.h" // Caterpillar D6 Dozer
 
 // Dumpers -------
 // #include "vehicles/Benford3TonDumper.h" // Benford 3 ton dumper
