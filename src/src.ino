@@ -4351,6 +4351,17 @@ void led()
   }
 #else // normal manual mode
   // Lights state machine
+
+  if (pulseWidth[14] < 1400) {
+    lightsState = 0; // lights off
+  }
+  else if (pulseWidth[14] > 1600) {
+    lightsState = 5;
+  }
+  else {
+    lightsState = 3;
+  }
+
   switch (lightsState)
   {
 
@@ -5440,14 +5451,14 @@ void rcTriggerRead()
   // CH5 (FUNCTION_R) ----------------------------------------------------------------------
   // Cycling light state machine, if dual rate @75% and long in position -----
   static bool lightsStateLock;
-  if (functionR75u.toggleLong(pulseWidth[5], 1150) != lightsStateLock)
-  {
-    if (lightsState >= 5)
-      lightsState = 0;
-    else
-      lightsState++;
-    lightsStateLock = !lightsStateLock;
-  }
+ // if (functionR75u.toggleLong(pulseWidth[5], 1150) != lightsStateLock)
+ // {
+ //   if (lightsState >= 5)
+ //     lightsState = 0;
+ //   else
+ //     lightsState++;
+ //   lightsStateLock = !lightsStateLock;
+ // }
 
   // Toggling high / low beam, if dual rate @100% and long in position
   static bool beamStateLock;

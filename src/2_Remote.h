@@ -2,10 +2,10 @@
 
 // Select (remove //) the remote configuration profile you have:
 // #define FLYSKY_FS_I6X            // <------- Flysky FS-i6x
- #define FLYSKY_FS_I6S            // <------- Flysky FS-i6s
+// #define FLYSKY_FS_I6S            // <------- Flysky FS-i6s
 // #define FLYSKY_FS_I6S_LOADER     // <------- Flysky FS-i6s for BURNIE222 Volvo L120H loader (use IBUS communication setting)
 // #define FLYSKY_FS_I6S_DOZER     // <------- Flysky FS-i6s for dozer (use IBUS communication setting)
-// #define WB_EXCAVATOR  // <------- WB excavator (use SBUS communication setting)
+ #define WB_EXCAVATOR  // <------- WB excavator (use SBUS communication setting)
 // #define FLYSKY_FS_I6S_EXCAVATOR  // <------- Flysky FS-i6s for KABOLITE K336 hydraulic excavator (use IBUS communication setting)
 // #define FRSKY_TANDEM_EXCAVATOR   // <------- Frsky Tandem XE for hydraulic excavator (use SBUS communication setting)
 // #define FRSKY_TANDEM_HARMONY_LOADER // <------- Frsky Tandem XE for Lukas Cajkar Harmony 370 (use SBUS communication setting)
@@ -173,20 +173,20 @@ boolean sbusInverted = true; // true = standard (non inverted) SBUS signal
 
 // Channel assignment (use NONE for non existing channels!)
 // Remote channel #######   // Sound controller channel ##########################################
-#define STEERING 4           // CH1 steering
+#define STEERING 1           // CH1 steering
 #define GEARBOX 10           // CH2 3 position switch for gearbox (left throttle in tracked mode)
 #define THROTTLE 3           // CH3 throttle & brake (right throttle in tracked mode)
 #define HORN 6               // CH4 horn and bluelight / siren
-#define FUNCTION_R 2         // CH5 jake brake, high / low beam, headlight flasher, engine on / off
-#define FUNCTION_L 1         // CH6 indicators, hazards
-#define POT2 5               // CH7 pot 2 dump bed
+#define FUNCTION_R NONE         // CH5 Dump Bed
+#define FUNCTION_L NONE         // CH6 indicators, hazards
+#define POT2 5            // CH7 lights
 #define MODE1 8              // CH8 mode 1 switch
 #define MODE2 NONE           // CH9 mode 2 switch
 #define MOMENTARY1 NONE      // CH10
 #define HAZARDS NONE         // CH11
 #define INDICATOR_LEFT NONE  // CH12
 #define INDICATOR_RIGHT NONE // CH13
-#define CH_14 14             // CH14
+#define CH_14 7             // CH14
 #define CH_15 15             // CH15
 #define CH_16 16             // CH16
 

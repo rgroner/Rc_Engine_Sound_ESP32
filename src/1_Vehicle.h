@@ -54,7 +54,7 @@
 // #include "vehicles/FergusonTEA20.h" // 1940ies Ferguson TEA20 petrol engine tractor
 
 // Excavators -------
-// #include "vehicles/Volvo EC550ElExcavator.h" // Volvo EC550EL 55 ton ecxavator (use "FLYSKY_FS_I6S_EXCAVATOR" remote profile and SERVOS_EXCAVATOR servo profile)
+ #include "vehicles/Volvo EC550ElExcavator.h" // Volvo EC550EL 55 ton ecxavator (use "FLYSKY_FS_I6S_EXCAVATOR" remote profile and SERVOS_EXCAVATOR servo profile)
 // #include "vehicles/Caterpillar323Excavator.h" // Caterpillar 323 excavator (use "FLYSKY_FS_I6S_EXCAVATOR" remote profile)
 // #include "vehicles/Caterpillar323ExcavatorNew.h" // Caterpillar 323 excavator (use "FLYSKY_FS_I6S_EXCAVATOR" remote profile, WB excavator)
 // #include "vehicles/Pingon14CExcavator.h" // Pingon 14C excavator (use "FLYSKY_FS_I6S_EXCAVATOR" remote profile)
@@ -73,7 +73,7 @@
 // #include "vehicles/HitachiZW370.h" // Hitachi ZW 370-6 heavy wheel loader (for Lukas Cajkar Harmony 370 3D printed loader)
 
 // Articulated Dump Trucks -------
-#include "vehicles/CAT730.h" // Caterpillar 730 heavy dump truck
+//#include "vehicles/CAT730.h" // Caterpillar 730 heavy dump truck
 // #include "vehicles/VolvoA40G.h" // Volvo A40G articulated dump truck
 
 // Rough Terrain Cranes -------
